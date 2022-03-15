@@ -30,7 +30,6 @@ var loadTasks = function () {
 
   // loop over object properties
   $.each(tasks, function (list, arr) {
-    console.log(list, arr);
     // then loop over sub-array
     arr.forEach(function (task) {
       createTask(task.text, task.date, list);
@@ -163,3 +162,74 @@ $("#remove-tasks").on("click", function () {
 
 // load tasks for the first time
 loadTasks();
+
+// array to store the task data in
+var tempArr = [];
+
+//selecting all elements with a class of .list-group inside of elements with a class of .card then call the sortable() function
+$(".card .list-group").sortable({
+  //sortable turns every element into a sortable list with the class of list group. the connectWith: property links the elements together
+  connectWith: $(".card .list-group"),
+
+  scroll: false,
+  tolerance: "pointer",
+
+  //helper creates a copy of the dragged item so click events do not fire
+  helper: "clone",
+
+  // activate: function (event) {
+  //   console.log("activate", this);
+  // },
+  // deactivate: function (event) {
+  //   console.log("deactivate", this);
+  // },
+  // over: function (event) {
+  //   console.log("over", event.target);
+  // },
+  // out: function (event) {
+  //   console.log("out", event.target);
+  // },
+  //update fires when the contents of a element has changed
+  update: function (event) {
+    // loop over current set of children in sortable list
+    $(this)
+      .children()
+      .each(function () {
+        //get the p element of the current target (in this case its li) and get the text Note: the p is the to do task
+        var text = $(this).find("p").text().trim();
+        //get the span element of the current target (in this case its li) and get the text Note the span is the date
+        var date = $(this).find("span").text().trim();
+
+        //add span and p tag to object then add to the temp array
+        tempArr.push({
+          text: text,
+          date: date,
+        });
+      });
+    // trim down list's ID to match object property
+    var arrName = $(this).attr("id").replace("list-", "");
+
+    // update array on tasks object and save
+    tasks[arrName] = tempArr;
+    saveTasks();
+  },
+});
+
+//select the element with the id trash, then add the droppable method on it,then call a callback function
+$("#trash").droppable({
+  //accept controls which draggable items are "accepted" my the droppable in this case the ul
+  accept: ".card .list-group-item",
+  //Specifies which mode to use for testing whether a draggable is hovering over a droppable Note: test touch vs fit 
+  tolerance: "touch",
+  //UI is an jquery object that we can reference 
+  drop: function (event, ui) {
+    console.log("drop");
+    ui.draggable.remove();
+  },
+  over: function (event, ui) {
+    console.log("over");
+  },
+  out: function (event, ui) {
+    console.log("out");
+  },
+});
