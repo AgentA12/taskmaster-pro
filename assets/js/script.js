@@ -143,7 +143,7 @@ $("#task-form-modal").on("shown.bs.modal", function () {
 });
 
 // save button in modal was clicked
-$("#task-form-modal .btn-primary").click(function () {
+$("#task-form-modal .btn-save").click(function () {
   // get form values
   var taskText = $("#modalTaskDescription").val();
   var taskDate = $("#modalDueDate").val();
@@ -190,18 +190,18 @@ $(".card .list-group").sortable({
   //helper creates a copy of the dragged item so click events do not fire
   helper: "clone",
 
-  // activate: function (event) {
-  //   console.log("activate", this);
-  // },
-  // deactivate: function (event) {
-  //   console.log("deactivate", this);
-  // },
-  // over: function (event) {
-  //   console.log("over", event.target);
-  // },
-  // out: function (event) {
-  //   console.log("out", event.target);
-  // },
+  activate: function (event) {
+    $(this).addClass("dropover");
+  },
+  deactivate: function (event) {
+    $(this).removeClass("dropover");
+  },
+  over: function (event) {
+    $(event.target).addClass("dropover-active");
+  },
+  out: function (event) {
+    $(event.target).removeClass("dropover-active");
+  },
   //update fires when the contents of a element has changed
   update: function (event) {
     // loop over current set of children in sortable list
@@ -273,3 +273,9 @@ function auditTask(taskEl) {
     $(taskEl).addClass("list-group-item-warning");
   }
 }
+
+setInterval(function () {
+  $(".card .list-group-item").each(function (index, el) {
+    auditTask(el);
+  });
+}, 1000 * 60 * 30);
